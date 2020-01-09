@@ -1,7 +1,7 @@
 Summary:        CPU Frequency changing related utilities
 Name:           cpufrequtils
 Version:        007
-Release:        5%{?dist}
+Release:        6%{?dist}
 Group:          System Environment/Base
 License:        GPLv2
 URL:            http://www.kernel.org/pub/linux/utils/kernel/cpufreq/cpufrequtils.html
@@ -10,6 +10,7 @@ Source:         http://www.kernel.org/pub/linux/utils/kernel/cpufreq/%{name}-%{v
 Patch0:         disable-gsic.patch
 # sets the same POT-Creation-Date for all archs to prevent multilib issues
 Patch1:         cpufrequtils-multilib.patch
+Patch2:         cpufrequtils-007-fix-aperf-on-x86.patch
 Buildroot:      %{_tmppath}/%{name}-%{version}-root
 BuildRequires:  libsysfs-devel gettext
 # pulls in automake and autoconf
@@ -35,6 +36,7 @@ The cpufrequtils development files.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1 -b .aperf-x86
 
 %build
 make CFLAGS="$RPM_OPT_FLAGS"
@@ -100,6 +102,10 @@ rm -rf %{buildroot};
 %{_includedir}/cpufreq.h
 
 %changelog
+* Thu Jun 30 2011 Petr Sabata <contyk@redhat.com> - 007-6
+- Fix cpufreq-aperf on x86
+- Resolves: rhzb#675734
+
 * Mon Jul 12 2010 Petr Sabata <psabata@redhat.com> - 007-5
 - cpufrequtils-multilib.patch; alters the POT creation date
 - Resolves: rhbz#612935
