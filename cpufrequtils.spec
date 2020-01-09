@@ -1,16 +1,19 @@
 Summary:        CPU Frequency changing related utilities
 Name:           cpufrequtils
 Version:        007
-Release:        6%{?dist}
+Release:        8%{?dist}
 Group:          System Environment/Base
 License:        GPLv2
 URL:            http://www.kernel.org/pub/linux/utils/kernel/cpufreq/cpufrequtils.html
-Source:         http://www.kernel.org/pub/linux/utils/kernel/cpufreq/%{name}-%{version}.tar.bz2
+Source0:        http://www.kernel.org/pub/linux/utils/kernel/cpufreq/%{name}-%{version}.tar.bz2
+Source1:        cpufreq-aperf.1
 # used by all major Linux and BSD distributions; reason unknown, though
 Patch0:         disable-gsic.patch
 # sets the same POT-Creation-Date for all archs to prevent multilib issues
 Patch1:         cpufrequtils-multilib.patch
 Patch2:         cpufrequtils-007-fix-aperf-on-x86.patch
+Patch3:         cpufrequtils-007-enable-debug.patch
+Patch4:         cpufrequtils-007-setspeed-path.patch
 Buildroot:      %{_tmppath}/%{name}-%{version}-root
 BuildRequires:  libsysfs-devel gettext
 # pulls in automake and autoconf
@@ -37,6 +40,8 @@ The cpufrequtils development files.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1 -b .aperf-x86
+%patch3 -p1 -b .debug
+%patch4 -p1 -b .setspeed
 
 %build
 make CFLAGS="$RPM_OPT_FLAGS"
@@ -54,6 +59,7 @@ cd ..
 rm -rf %{buildroot};
 
 make DESTDIR=%{buildroot} mandir=%{_mandir} bindir=%{_bindir} includedir=%{_includedir} libdir=%{_libdir} install
+install -p -m644 %{SOURCE1} %{buildroot}/%{_mandir}/man1/
 
 # Remove libtool lib and static lib
 rm -f %{buildroot}%{_libdir}/*.{a,la}
@@ -102,6 +108,13 @@ rm -rf %{buildroot};
 %{_includedir}/cpufreq.h
 
 %changelog
+* Wed Dec 03 2014 Petr Šabata <contyk@redhat.com> - 007-8
+- Correct the path to cpufreq_setspeed in cpufreq-set(1) manpage (#730304)
+
+* Fri Oct 31 2014 Petr Šabata <contyk@redhat.com> - 007-7
+- Generate debuginfo (#728999)
+- Include the manpage for cpufreq-aperf(1) (#730304)
+
 * Thu Jun 30 2011 Petr Sabata <contyk@redhat.com> - 007-6
 - Fix cpufreq-aperf on x86
 - Resolves: rhzb#675734
@@ -156,7 +169,7 @@ rm -rf %{buildroot};
 * Tue Jul 11 2006 Karsten Hopp <karsten@redhat.de>
 - buildrequire libsysfs-devel
 
-* Wed Jul  9 2006 Dave Jones <davej@redhat.com>
+* Sun Jul  9 2006 Dave Jones <davej@redhat.com>
 - Rebuild against new libsysfs
 
 * Wed Jun  7 2006 Dave Jones <davej@redhat.com>
